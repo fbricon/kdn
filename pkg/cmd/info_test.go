@@ -196,7 +196,7 @@ func TestInfoCmd_E2E(t *testing.T) {
 		}
 
 		agentConfig := `{"packages": [], "run_commands": [], "terminal_command": []}`
-		for _, agent := range []string{"claude", "cursor", "goose"} {
+		for _, agent := range []string{"claude", "cursor", "goose", "opencode"} {
 			if err := os.WriteFile(filepath.Join(configDir, agent+".json"), []byte(agentConfig), 0644); err != nil {
 				t.Fatalf("Failed to write %s config: %v", agent, err)
 			}
@@ -217,7 +217,7 @@ func TestInfoCmd_E2E(t *testing.T) {
 			t.Fatalf("Failed to parse JSON: %v", err)
 		}
 
-		expected := []string{"claude", "cursor", "goose"}
+		expected := []string{"claude", "cursor", "goose", "opencode"}
 		if !slices.Equal(response.Agents, expected) {
 			t.Errorf("Expected agents %v, got: %v", expected, response.Agents)
 		}

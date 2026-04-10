@@ -35,6 +35,9 @@ const (
 
 	// CursorConfigFileName is the filename for Cursor agent configuration
 	CursorConfigFileName = "cursor.json"
+
+	// OpencodeConfigFileName is the filename for OpenCode agent configuration
+	OpencodeConfigFileName = "opencode.json"
 )
 
 // defaultImageConfig returns the default base image configuration.
@@ -96,5 +99,18 @@ func defaultCursorConfig() *AgentConfig {
 			"curl https://cursor.com/install -fsS | bash",
 		},
 		TerminalCommand: []string{"agent"},
+	}
+}
+
+// defaultOpencodeConfig returns the default OpenCode agent configuration.
+func defaultOpencodeConfig() *AgentConfig {
+	return &AgentConfig{
+		Packages: []string{},
+		RunCommands: []string{
+			"curl -fsSL https://opencode.ai/install | bash",
+			fmt.Sprintf("mkdir -p /home/%s/.local/bin && ln -s /home/%s/.opencode/bin/opencode /home/%s/.local/bin/opencode", constants.ContainerUser, constants.ContainerUser, constants.ContainerUser),
+			fmt.Sprintf("mkdir -p /home/%s/.config/opencode", constants.ContainerUser),
+		},
+		TerminalCommand: []string{"opencode"},
 	}
 }

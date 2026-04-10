@@ -29,7 +29,7 @@ The Podman runtime configuration allows customization of the base image, install
 - **Config Interface** (`pkg/runtime/podman/config/config.go`): Interface for managing Podman runtime configuration
 - **ImageConfig** (`pkg/runtime/podman/config/types.go`): Base image configuration (Fedora version, packages, sudo binaries, custom RUN commands)
 - **AgentConfig** (`pkg/runtime/podman/config/types.go`): Agent-specific configuration (packages, RUN commands, terminal command)
-- **Defaults** (`pkg/runtime/podman/config/defaults.go`): Default configurations for image and agents (Claude, Goose)
+- **Defaults** (`pkg/runtime/podman/config/defaults.go`): Default configurations for image and agents (Claude, Goose, Cursor, OpenCode)
 
 ## Configuration Storage
 
@@ -37,9 +37,11 @@ Configuration files are stored in the runtime's storage directory:
 
 ```text
 <storage-dir>/runtimes/podman/config/
-├── image.json    # Base image configuration
-├── claude.json   # Claude agent configuration
-└── goose.json    # Goose agent configuration
+├── image.json      # Base image configuration
+├── claude.json     # Claude agent configuration
+├── goose.json      # Goose agent configuration
+├── cursor.json     # Cursor agent configuration
+└── opencode.json   # OpenCode agent configuration
 ```
 
 ## Configuration Files
@@ -63,7 +65,7 @@ Configuration files are stored in the runtime's storage directory:
 
 ### Agent-Specific Configuration
 
-Agent configurations are named `<agent-name>.json`. The Podman runtime provides default configurations for Claude Code and Goose.
+Agent configurations are named `<agent-name>.json`. The Podman runtime provides default configurations for Claude Code, Goose, Cursor, and OpenCode.
 
 **claude.json - Claude Code Agent:**
 
@@ -87,6 +89,19 @@ Agent configurations are named `<agent-name>.json`. The Podman runtime provides 
     "cd /tmp && curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash"
   ],
   "terminal_command": ["goose"]
+}
+```
+
+**opencode.json - OpenCode Agent:**
+
+```json
+{
+  "packages": [],
+  "run_commands": [
+    "go install github.com/opencode-ai/opencode@latest",
+    "mkdir -p /home/agent/.config/opencode"
+  ],
+  "terminal_command": ["opencode"]
 }
 ```
 
@@ -141,6 +156,8 @@ The config system validates:
 - Default agent configs are provided for:
   - **Claude Code** - Installs from the official install script at `claude.ai/install.sh`
   - **Goose** - Installs from the official installer at `github.com/block/goose`
+  - **Cursor** - Installs from the official installer at `cursor.com/install`
+  - **OpenCode** - Installs via `go install github.com/opencode-ai/opencode@latest`
 
 ## Containerfile Generation
 
@@ -195,7 +212,7 @@ These values are not configurable:
 - Uses nested JSON structure for clarity
 - Validates all configurations on load to catch errors early
 - Separate concerns: base image vs agent-specific settings
-- Extensible: easy to add new agent configurations (e.g., `goose.json`, `cursor.json`)
+- Extensible: easy to add new agent configurations
 
 ## Related Skills
 

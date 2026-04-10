@@ -24,7 +24,7 @@ The multi-level configuration system allows users to customize workspace setting
   - Can be configured using the `--workspace-configuration` flag of the `init` command (path to directory containing `workspace.json`)
 - **Project-specific config** (`~/.kdn/config/projects.json`) - User's custom config for specific projects
 - **Global config** (empty string `""` key in `projects.json`) - Settings applied to all projects
-- **Agent-specific config** (`~/.kdn/config/agents.json`) - Per-agent overrides (e.g., Claude, Goose)
+- **Agent-specific config** (`~/.kdn/config/agents.json`) - Per-agent overrides (e.g., Claude, Goose, OpenCode)
 
 These configurations control what gets injected **into** workspaces (environment variables, mounts), not how the workspace runtime is built or configured.
 
@@ -66,6 +66,7 @@ When the `--model` flag is provided during `init`, kdn does two things with the 
    - Claude: `model` field in `.claude/settings.json`
    - Goose: `GOOSE_MODEL` field in `.config/goose/config.yaml`
    - Cursor: `model` object in `.cursor/cli-config.json`
+   - OpenCode: `model` field in `.config/opencode/opencode.json`
 
 The `--model` flag takes precedence over any model already defined in the settings files. If no model is specified, `GetModel()` returns an empty string and the `model` field is omitted from JSON output.
 

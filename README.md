@@ -12,6 +12,7 @@ The architecture is built around pluggable runtimes. The first supported runtime
 - **Claude Code** - Anthropic's official CLI for Claude
 - **Goose** - AI agent for development tasks
 - **Cursor** - AI-powered code editor agent
+- **OpenCode** - Open-source AI coding agent for the terminal
 
 **Key Features**
 
@@ -69,7 +70,7 @@ make test-coverage
 ## Glossary
 
 ### Agent
-An AI assistant that can perform tasks autonomously. In kdn, agents are the different AI tools (Claude Code, Goose, Cursor) that can be launched and configured.
+An AI assistant that can perform tasks autonomously. In kdn, agents are the different AI tools (Claude Code, Goose, Cursor, OpenCode) that can be launched and configured.
 
 ### LLM (Large Language Model)
 The underlying AI model that powers the agents. Examples include Claude (by Anthropic), GPT (by OpenAI), and other language models.
@@ -1190,6 +1191,11 @@ The Podman runtime includes default configurations for the following AI agents:
 - Task automation and code assistance
 - Configurable development workflows
 
+**OpenCode** - Installed using `go install github.com/opencode-ai/opencode@latest`:
+- Open-source terminal-based AI coding agent
+- Support for multiple AI providers (Anthropic, OpenAI, Google, Ollama, etc.)
+- Built-in TUI with session management and LSP integration
+
 The agent runs within the container environment and has access to the mounted workspace sources and dependencies.
 
 ### Working Directory
@@ -1241,9 +1247,11 @@ The Podman runtime is fully configurable through JSON files. When you first use 
 
 ```text
 $HOME/.kdn/runtimes/podman/config/
-├── image.json    # Base image configuration
-├── claude.json   # Claude agent configuration
-└── goose.json    # Goose agent configuration
+├── image.json      # Base image configuration
+├── claude.json     # Claude agent configuration
+├── goose.json      # Goose agent configuration
+├── cursor.json     # Cursor agent configuration
+└── opencode.json   # OpenCode agent configuration
 ```
 
 Or if using a custom storage directory:
@@ -1307,7 +1315,7 @@ Controls the container's base image, packages, and sudo permissions.
 
 #### Agent Configuration
 
-Controls agent-specific packages and installation steps. The Podman runtime provides default configurations for Claude Code (`claude.json`) and Goose (`goose.json`).
+Controls agent-specific packages and installation steps. The Podman runtime provides default configurations for Claude Code (`claude.json`), Goose (`goose.json`), Cursor (`cursor.json`), and OpenCode (`opencode.json`).
 
 **Structure (claude.json):**
 
@@ -1334,6 +1342,21 @@ Controls agent-specific packages and installation steps. The Podman runtime prov
   ],
   "terminal_command": [
     "goose"
+  ]
+}
+```
+
+**Structure (opencode.json):**
+
+```json
+{
+  "packages": [],
+  "run_commands": [
+    "go install github.com/opencode-ai/opencode@latest",
+    "mkdir -p /home/agent/.config/opencode"
+  ],
+  "terminal_command": [
+    "opencode"
   ]
 }
 ```
@@ -2225,7 +2248,7 @@ kdn init /tmp/workspace --runtime podman --agent claude
 
 - **Runtime is required**: You must specify a runtime using either the `--runtime` flag or the `KDN_DEFAULT_RUNTIME` environment variable
 - **Agent is required**: You must specify an agent using either the `--agent` flag or the `KDN_DEFAULT_AGENT` environment variable
-- **Model is optional**: Use `--model` to specify a model ID for the agent. The flag takes precedence over any model defined in the agent's default settings files (`~/.kdn/config/<agent>/`). If not provided, the agent uses its default model or the one configured in settings. All agents support model configuration: Claude (via `.claude/settings.json`), Goose (via `config.yaml`), and Cursor (via `.cursor/cli-config.json`)
+- **Model is optional**: Use `--model` to specify a model ID for the agent. The flag takes precedence over any model defined in the agent's default settings files (`~/.kdn/config/<agent>/`). If not provided, the agent uses its default model or the one configured in settings. All agents support model configuration: Claude (via `.claude/settings.json`), Goose (via `config.yaml`), Cursor (via `.cursor/cli-config.json`), and OpenCode (via `.config/opencode/opencode.json`)
 - **Project auto-detection**: The project identifier is automatically detected from git repository information or source directory path. Use `--project` flag to override with a custom identifier
 - **Auto-start**: Use the `--start` flag or set `KDN_INIT_AUTO_START=1` to automatically start the workspace after registration, combining `init` and `start` into a single operation
 - All directory paths are converted to absolute paths for consistency
